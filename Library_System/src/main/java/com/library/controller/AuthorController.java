@@ -120,29 +120,28 @@ public class AuthorController {
 //        }
 //    }
     
-    @Operation(summary = "List all authors", description = "Retrieves a paginated list of all authors.")
+    @Operation(summary = AppConstants.LIST_BOOKS_SUMMARY, description = AppConstants.LIST_BOOKS_DESC)
     @GetMapping
-    public ResponseEntity<?> listAllAuthors(
-            @RequestParam(defaultValue = "1") int page,   // 1-based index for client
-            @RequestParam(defaultValue = "10") int size,
-            @RequestParam(defaultValue = "id") String sortBy,
-            @RequestParam(defaultValue = "asc") String sortDir) {
-
+    public ResponseEntity<?> listAllBooks(
+            @ParameterObject Pageable pageable,  // Supports pagination & sorting
+            @Parameter(description = "Sorting field", example = "title")
+            @RequestParam(required = false, defaultValue = "id") String sortBy,
+            @Parameter(description = "Sort direction (asc/desc)", example = "asc")
+            @RequestParam(required = false, defaultValue = "asc") String sortDir) {
+        
         try {
-            // Convert to 0-based index for Spring
-            int adjustedPage = (page > 0) ? page - 1 : 0;
-
-            Pageable pageable = PageRequest.of(
-                    adjustedPage,
-                    size,
+            // Apply sorting dynamically
+            Pageable sortedPageable = PageRequest.of(
+                    pageable.getPageNumber(),
+                    pageable.getPageSize(),
                     sortDir.equalsIgnoreCase("desc") ? Sort.by(sortBy).descending() : Sort.by(sortBy).ascending()
             );
 
-            Page<Author> authors = authorService.listAllAuthors(pageable);
-            return ResponseEntity.ok(authors);
+            Page<Book> books = bookService.listAllBooks(sortedPageable);
+            return ResponseEntity.ok(books);
         } catch (Exception ex) {
-            logger.error("Error fetching authors: {}", ex.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error retrieving authors");
+            logger.error("Error fetching books: {}", ex.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error retrieving books");
         }
-    }
+}
 }

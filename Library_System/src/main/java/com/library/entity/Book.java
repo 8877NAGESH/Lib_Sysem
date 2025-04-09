@@ -3,8 +3,6 @@ package com.library.entity;
 import java.time.LocalDate;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonProperty.Access;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -31,7 +29,6 @@ import lombok.NoArgsConstructor;
 public class Book {
     
     @Id
-    @JsonProperty(access = Access.READ_ONLY)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     
@@ -41,8 +38,7 @@ public class Book {
     private String title;
     
     @NotBlank(message = "ISBN cannot be blank")
-    @Pattern(
-    	    regexp = "^(?:\\d{9}X|\\d{10}|\\d{13}|\\d{3}-\\d{10}|\\d{1,5}-\\d{1,7}-\\d{1,7}-[\\dX])$",message = "ISBN format is invalid")
+    @Pattern(regexp = "^(?=(?:\\D*\\d){10}(?:(?:\\D*\\d){3})?$)[\\d-]+$", message = "ISBN format is invalid")
     @Column(unique = true, nullable = false)
     private String isbn;
     
@@ -52,6 +48,7 @@ public class Book {
     
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "author_id", nullable = false)
+    @JsonIgnore
     private Author author;
 
 	public Long getId() {

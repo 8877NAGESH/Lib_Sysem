@@ -5,8 +5,6 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonProperty.Access;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -31,7 +29,6 @@ import lombok.NoArgsConstructor;
 public class Author {
     
     @Id
-    @JsonProperty(access = Access.READ_ONLY)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     
