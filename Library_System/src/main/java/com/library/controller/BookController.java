@@ -2,7 +2,9 @@ package com.library.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -12,10 +14,14 @@ import com.library.service.BookService;
 import com.library.util.AppConstants;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springdoc.core.annotations.ParameterObject;
 
 import java.util.Optional;
 
@@ -32,7 +38,8 @@ public class BookController {
     @Autowired
     private BookService bookService;
 
-    @Operation(summary = AppConstants.CREATE_BOOK_SUMMARY, description = AppConstants.CREATE_BOOK_DESC)
+    @Operation( summary = AppConstants.CREATE_BOOK_SUMMARY, description = AppConstants.CREATE_BOOK_DESC,
+    		 responses = { @ApiResponse( responseCode = "201", description = "Book created")})
     @PostMapping
     public ResponseEntity<?> createBook(@RequestBody Book book) {
         try {
@@ -90,10 +97,35 @@ public class BookController {
         }
     }
 
+//    @Operation(summary = AppConstants.LIST_BOOKS_SUMMARY, description = AppConstants.LIST_BOOKS_DESC)
+//    @GetMapping
+//    public ResponseEntity<?> listAllBooks(Pageable pageable) {
+//        try {
+//            Page<Book> books = bookService.listAllBooks(pageable);
+//            return ResponseEntity.ok(books);
+//        } catch (Exception ex) {
+//            logger.error("Error fetching books: {}", ex.getMessage());
+//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error retrieving books");
+//        }
+//    }
     @Operation(summary = AppConstants.LIST_BOOKS_SUMMARY, description = AppConstants.LIST_BOOKS_DESC)
     @GetMapping
-    public ResponseEntity<?> listAllBooks(Pageable pageable) {
+    public ResponseEntity<?> listAllBooks(
+            @RequestParam(defaultValue = "1") int page,   // Accept 1-based from clients
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "id") String sortBy,
+            @RequestParam(defaultValue = "asc") String sortDir) {
+
         try {
+            // Convert to 0-based for Spring
+            int adjustedPage = (page > 0) ? page - 1 : 0;
+
+            Pageable pageable = PageRequest.of(
+                    adjustedPage,
+                    size,
+                    sortDir.equalsIgnoreCase("desc") ? Sort.by(sortBy).descending() : Sort.by(sortBy).ascending()
+            );
+
             Page<Book> books = bookService.listAllBooks(pageable);
             return ResponseEntity.ok(books);
         } catch (Exception ex) {
@@ -101,4 +133,5 @@ public class BookController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error retrieving books");
         }
     }
+
 }
