@@ -97,17 +97,6 @@ public class BookController {
         }
     }
 
-//    @Operation(summary = AppConstants.LIST_BOOKS_SUMMARY, description = AppConstants.LIST_BOOKS_DESC)
-//    @GetMapping
-//    public ResponseEntity<?> listAllBooks(Pageable pageable) {
-//        try {
-//            Page<Book> books = bookService.listAllBooks(pageable);
-//            return ResponseEntity.ok(books);
-//        } catch (Exception ex) {
-//            logger.error("Error fetching books: {}", ex.getMessage());
-//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error retrieving books");
-//        }
-//    }
     @Operation(summary = AppConstants.LIST_BOOKS_SUMMARY, description = AppConstants.LIST_BOOKS_DESC)
     @GetMapping
     public ResponseEntity<?> listAllBooks(
@@ -120,6 +109,7 @@ public class BookController {
             // Convert to 0-based for Spring
             int adjustedPage = (page > 0) ? page - 1 : 0;
 
+            //It creates a Sort object in descending order if sortDir is "desc", otherwise in ascending order.
             Pageable pageable = PageRequest.of(
                     adjustedPage,
                     size,
