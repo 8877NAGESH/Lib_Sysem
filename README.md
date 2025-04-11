@@ -24,8 +24,8 @@ Swagger/OpenAPI (for API documentation)
 
 🔍 Swagger UI – Easy API exploration and testing
 
-
 /// Use full URLS
+
 Access Swagger UI at http://localhost:8081/swagger-ui/.
 
 Access H2 Console at http://localhost:8081/h2-console/.
